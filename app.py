@@ -1,7 +1,8 @@
-from fastapi import FastAPI , Request
+from fastapi import FastAPI , Request, Depends
 from starlette.background import BackgroundTasks
+from sqlalchemy.orm import Session
 import uvicorn
-from models import  SettingAdmin, SignalAdmin, SymbolAdmin, Symbols, ReportView
+from models import  SettingAdmin, SignalAdmin, SymbolAdmin, Symbols, ReportView, Setting
 from database import get_db, engine, Base
 from sqladmin import Admin
 from setLogger import get_logger
@@ -25,21 +26,23 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()#lifespan=lifespan)
 admin = Admin(app, engine)
 
-
+admin.add_view(ReportView)
 admin.add_view(SettingAdmin)
 admin.add_view(SignalAdmin)
 admin.add_view(SymbolAdmin)
-admin.add_view(ReportView)
-
-
-
-# @app.get("/", response_class=HTMLResponse)
-# async def index(request: Request):
-#      return HTMLResponse('index.html')
 
 
 @app.get('/run')
-async def run(tasks: BackgroundTasks):
+async def run(tasks: BackgroundTasks, db: Session=Depends(get_db)):
+    user = db.query(Setting).first()
+    Bingx.leverage = user.leverage
+    Bingx.trade_value = user.trade_value
+    Bingx.ema_fast = user.ema_fast
+    Bingx.ema_slow = user.ema_slow
+    symbols = db.query(Symbols).all()
+    for sym in symbols:
+        Bingx.symbols.append(sym.symbol)
+    
     # tasks.add_task(handle_schedule)
     Bingx.bot = "Run"
     return  RedirectResponse(url="/admin/home")

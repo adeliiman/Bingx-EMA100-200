@@ -23,6 +23,11 @@ with open('config.json') as f:
 class BingX:
 	bot: str = 'Stop' # 'Run'
 	kline: bool = False
+	leverage: int = 10
+	trade_value: int = 10
+	ema_fast: int = 100
+	ema_slow: int = 200
+	symbols: list = []
 
 
 	def _try(self, method:str, **kwargs):

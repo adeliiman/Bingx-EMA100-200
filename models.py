@@ -12,11 +12,15 @@ class Setting(Base):
     __tablename__ = "setting"
     id = Column(Integer,primary_key=True)  
     timeframe = Column(String)
+    leverage = Column(Integer)
+    trade_value = Column(Integer)
+    ema_fast = Column(Integer)
+    ema_slow = Column(Integer)
 
 
 class SettingAdmin(ModelView, model=Setting):
     #form_columns = [User.name]
-    column_list = [Setting.id, Setting.timeframe]
+    column_list = [Setting.timeframe, Setting.leverage, Setting.trade_value, Setting.ema_fast, Setting.ema_slow]
     name = "Setting"
     name_plural = "Setting"
     icon = "fa-solid fa-user"
@@ -41,31 +45,21 @@ class Signal(Base):
     id = Column(Integer,primary_key=True,index=True)
     symbol = Column(String)
     side = Column(String)
-    peak2 = Column(Float)
-    level0 = Column(Float)
-    level1 = Column(Float)
-    level2 = Column(Float)
-    level3 = Column(Float)
-    SLPrice = Column(Float)
-    vol1 = Column(Float)
-    vol2 = Column(Float)
-    vol3 = Column(Float)
+    price = Column(Float)
     time = Column(String)
-    status = Column(String)
 
 
 class SignalAdmin(ModelView, model=Signal):
-    column_list = [Signal.id, Signal.symbol, Signal.side, Signal.time, Signal.level0, Signal.level1, Signal.level2, Signal.level3, 
-                   Signal.SLPrice, Signal.status, Signal.peak2]
-    column_searchable_list = [Signal.symbol, Signal.side, Signal.time]
+    column_list = [Signal.id, Signal.symbol, Signal.side, Signal.time, Signal.price]
+    column_searchable_list = [Signal.symbol, Signal.side, Signal.time, Signal.price]
     #icon = "fa-chart-line"
     icon = "fas fa-chart-line"
-    column_sortable_list = [Signal.id, Signal.time]
-    column_formatters = {Signal.level0 : lambda m, a: round(m.level0,4),
-                         Signal.level1 : lambda m, a: round(m.level1,4),
-                         Signal.level2 : lambda m, a: round(m.level2,4),
-                         Signal.level3 : lambda m, a: round(m.level3,4),
-                         Signal.SLPrice : lambda m, a:round(m.SLPrice,4)}
+    column_sortable_list = [Signal.id, Signal.time, Signal.price, Signal.symbol, Signal.side]
+    # column_formatters = {Signal.level0 : lambda m, a: round(m.level0,4),
+    #                      Signal.level1 : lambda m, a: round(m.level1,4),
+    #                      Signal.level2 : lambda m, a: round(m.level2,4),
+    #                      Signal.level3 : lambda m, a: round(m.level3,4),
+    #                      Signal.SLPrice : lambda m, a:round(m.SLPrice,4)}
     
     async def on_model_change(self, data, model, is_created):
         # Perform some other action
@@ -76,34 +70,25 @@ class Symbols(Base):
     __tablename__ = "symbols"
     id = Column(Integer,primary_key=True)
     symbol = Column(String)
-    fibo1 = Column(Float, default=1.1)
-    fibo2 = Column(Float, default=1.5)
-    fibo3 = Column(Float, default=1.75)
-    slLevel = Column(Float, default=2)
-    vol1 = Column(Integer, default=1)
-    vol2 = Column(Integer, default=2)
-    vol3 = Column(Integer, default=7)
-    leverage = Column(Integer, default=10)
-    marginMode = Column(String)
-    test = Column(String)
-
 
 class SymbolAdmin(ModelView, model=Symbols):
-    column_list = [Symbols.id, Symbols.symbol, Symbols.fibo1, Symbols.fibo2, Symbols.fibo3, Symbols.slLevel,
-                   Symbols.vol1, Symbols.vol2, Symbols.vol3, Symbols.leverage, Symbols.marginMode, Symbols.test]
+    column_list = [Symbols.id, Symbols.symbol
+                   ]
     name = "Symbol"
     name_plural = "Symbol"
     icon = "fa-sharp fa-solid fa-bitcoin-sign"
-    form_overrides = dict(symbol=wtforms.StringField, marginMode=wtforms.SelectField)
-    form_args = dict(symbol=dict(validators=[wtforms.validators.regexp('.+[A-Z]-USDT')], label="symbol(BTC-USDT)"),
-                     marginMode=dict(choices=["Isolated", "Cross"]))
-    async def on_model_change(self, data, model, is_created):
-        print(is_created)
-        from database import SessionLocal
-        db = SessionLocal()
-        symbol = db.query(Symbols).order_by(Symbols.id.desc()).first()
-        symbol.test = "iman"
-        db.commit()
+    column_sortable_list = [Symbols.symbol]
+    column_searchable_list = [Symbols.symbol]
+    # form_overrides = dict(symbol=wtforms.StringField, marginMode=wtforms.SelectField)
+    # form_args = dict(symbol=dict(validators=[wtforms.validators.regexp('.+[A-Z]-USDT')], label="symbol(BTC-USDT)"),
+    #                  marginMode=dict(choices=["Isolated", "Cross"]))
+    # async def on_model_change(self, data, model, is_created):
+    #     print(is_created)
+    #     from database import SessionLocal
+    #     db = SessionLocal()
+    #     symbol = db.query(Symbols).order_by(Symbols.id.desc()).first()
+    #     symbol.test = "iman"
+    #     db.commit()
 
 
 
