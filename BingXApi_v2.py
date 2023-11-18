@@ -98,7 +98,7 @@ class BingXApi:
 
 
         def placeOrder(self, symbol, side, positionSide, price='', tradeType="MARKET", quoteOrderQty='', quantity='', stopPrice='', 
-                       takeProfit='', clientOrderID=''):
+                       takeProfit='', stopLoss='', clientOrderID=''):
             # side: SELL/BUY
             # tradeType: MARKET/LIMIT/STOP_MARKET/TAKE_PROFIT_MARKET/STOP/TAKE_PROFIT/TRIGGER_LIMIT/TRIGGER_MARKET/TRAILING_STOP_MARKET
             payload = {}
@@ -114,6 +114,7 @@ class BingXApi:
             "quantity": quantity,
             "stopPrice": stopPrice,
             "takeProfit": takeProfit,
+            "stopLoss": stopLoss,
             "clientOrderID": clientOrderID
             }
             paramsStr = self.praseParam(paramsMap)
@@ -264,14 +265,21 @@ class BingXApi:
 
 
 
-api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=True)
-# print(api.getServerTime())
-# print(api.getKline(symbol="BTC-USDT", interval="1m"))
+# api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=True)
+# # print(api.getServerTime())
+# klines = api.getKline(symbol="BTC-USDT", interval="1m", limit=20)
+# klines = klines['data'][::-1]
+# import pandas as pd
+# df = pd.DataFrame(klines)
+# df['time'] = pd.to_datetime(df['time']*1000000)
+# print(df)
 # print(api.getBalance())
-# print(api.getPositions("BTC-USDT"))
+
 # print(api.getOrders("ADA-USDT"))
 # print(api.getStopOrders("ADA-USDT"))
 # print(api.placeOrder(symbol="BTC-USDT", side="BUY",positionSide="LONG", price='30000', quantity=5, tradeType='MARKET'))
+# print("."*10)
+# print(api.getPositions("BTC-USDT"))
 # print(api.placeOrder(symbol="BTC-USDT", side="SELL",positionSide="LONG", stopPrice='35000', price=35000, quantity=0.0001, tradeType='STOP'))
 # print(api.placeOrder(symbol="BTC-USDT", side="SELL",positionSide="LONG", stopPrice='36500', price=37000, quantity=0.0001, tradeType='TAKE_PROFIT'))
 # print(api.placeOrder(symbol="BTC-USDT", side="SELL",positionSide="LONG", stopPrice='36500', price=37000, quantity=0.0001, tradeType='TRAILING_STOP_MARKET'))

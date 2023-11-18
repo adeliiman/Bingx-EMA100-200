@@ -9,7 +9,7 @@ from setLogger import get_logger
 from fastapi.responses import RedirectResponse
 from contextlib import asynccontextmanager
 from fastapi.responses import HTMLResponse
-from main import Bingx
+from main import Bingx, schedule_job
 
 
 logger = get_logger(__name__)
@@ -39,11 +39,14 @@ async def run(tasks: BackgroundTasks, db: Session=Depends(get_db)):
     Bingx.trade_value = user.trade_value
     Bingx.ema_fast = user.ema_fast
     Bingx.ema_slow = user.ema_slow
+    Bingx.TP_percent = user.TP_percent
+    Bingx.SL_percent = user.SL_percent
+    Bingx.timeframe = user.timeframe
     symbols = db.query(Symbols).all()
     for sym in symbols:
         Bingx.symbols.append(sym.symbol)
     
-    # tasks.add_task(handle_schedule)
+    tasks.add_task(schedule_job)
     Bingx.bot = "Run"
     return  RedirectResponse(url="/admin/home")
 
@@ -55,10 +58,22 @@ def stop():
 
 @app.get('/closeAll')
 def closeAll():
-    Bingx._try(method="closeAll")
-    print("Close All Positions.")
+    from main import api
+    res = api.closeAllPositions()
+    logger.info("Close All Positions." + str(res))
     return  RedirectResponse(url="/admin/home")
 
+@app.get('/signal')
+def set_signal(signal:str=None):
+    Bingx.signal = signal
+    if not signal:
+         Bingx.signal = None
+
+@app.get('/positions')
+def get_positions(symbol:str):
+    from main import api
+    res = api.getPositions(symbol=symbol)
+    logger.info(f"{res}")
 
 @app.get('/')
 async def index():

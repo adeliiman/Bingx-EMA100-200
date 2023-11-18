@@ -14,6 +14,8 @@ class Setting(Base):
     timeframe = Column(String)
     leverage = Column(Integer)
     trade_value = Column(Integer)
+    TP_percent = Column(Integer)
+    SL_percent = Column(Integer)
     ema_fast = Column(Integer)
     ema_slow = Column(Integer)
 
@@ -28,14 +30,14 @@ class SettingAdmin(ModelView, model=Setting):
                      )
     form_overrides =  dict(timeframe=wtforms.SelectField)
 
-    async def on_model_change(self, data, model, is_created):
-        # Perform some other action
-        #print(data)
-        pass
+    # async def on_model_change(self, data, model, is_created):
+    #     # Perform some other action
+    #     #print(data)
+    #     pass
 
-    async def on_model_delete(self, model):
-        # Perform some other action
-        pass
+    # async def on_model_delete(self, model):
+    #     # Perform some other action
+    #     pass
 
 
 
