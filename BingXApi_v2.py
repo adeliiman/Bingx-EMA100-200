@@ -146,26 +146,18 @@ class BingXApi:
             paramsStr = self.praseParam(paramsMap)
             return self.send_request(method, path, paramsStr, payload)
 
+        def getOrders(self, symbol):  # --> 'data': {'orders': None}
+            payload = {}
+            path = '/openApi/swap/v2/trade/order'
+            method = "GET"
+            paramsMap = {
+            "symbol": symbol,
+            "orderId": 0,
+            "recvWindow": 0
+             }
+            paramsStr = self.praseParam(paramsMap)
+            return self.send_request(method, path, paramsStr, payload)
 
-
-
-
-
-
-
-
-
-
-        # def getOrders(self, symbol):  # --> 'data': {'orders': None}
-        #     paramsMap = {
-        #         "symbol": symbol,
-        #         "apiKey": self.APIKEY,
-        #         "timestamp": int(time.time()*1000),
-        #     }
-        #     paramsStr = "&".join(["%s=%s" % (x, paramsMap[x]) for x in paramsMap ])
-        #     paramsStr += "&sign=" + self.genSignature("/api/v1/user/pendingOrders", "POST", paramsMap)
-        #     url = "%s/api/v1/user/pendingOrders?" % self.APIURL
-        #     return self.post(url, paramsStr)
 
 
         # def getStopOrders(self, symbol): #--> 'data': {'orders': []}

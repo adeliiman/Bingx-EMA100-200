@@ -74,6 +74,8 @@ def get_positions(symbol:str):
     from main import api
     res = api.getPositions(symbol=symbol)
     logger.info(f"{res}")
+    res = api.getOrders(symbol=symbol)
+    logger.info(f"{res}")
 
 @app.get('/')
 async def index():
