@@ -1,14 +1,12 @@
-from fastapi import FastAPI , Request, Depends
+from fastapi import FastAPI , Depends
 from starlette.background import BackgroundTasks
 from sqlalchemy.orm import Session
 import uvicorn
-from models import  SettingAdmin, SignalAdmin, SymbolAdmin, Symbols, ReportView, Setting
+from models import  SettingAdmin, SignalAdmin, SymbolAdmin, Symbols, ReportView, Setting, Signal
 from database import get_db, engine, Base
 from sqladmin import Admin
 from setLogger import get_logger
 from fastapi.responses import RedirectResponse
-from contextlib import asynccontextmanager
-from fastapi.responses import HTMLResponse
 from main import Bingx, schedule_job
 
 
@@ -16,14 +14,7 @@ logger = get_logger(__name__)
 
 Base.metadata.create_all(bind=engine)
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     get_db()
-#     # threading.Thread(target=start_bingx_ws).start()
-#     yield
-#     Bingx.ws = False
-
-app = FastAPI()#lifespan=lifespan)
+app = FastAPI()
 admin = Admin(app, engine)
 
 admin.add_view(ReportView)
@@ -48,12 +39,13 @@ async def run(tasks: BackgroundTasks, db: Session=Depends(get_db)):
     
     tasks.add_task(schedule_job)
     Bingx.bot = "Run"
+    logger.info("Bingx started ... ... ...")
     return  RedirectResponse(url="/admin/home")
 
 @app.get('/stop')
 def stop():
     Bingx.bot = "Stop"
-    print("Bingx stoped. ................")
+    logger.inf("Bingx stoped. ................")
     return  RedirectResponse(url="/admin/home")
 
 @app.get('/closeAll')
@@ -63,19 +55,25 @@ def closeAll():
     logger.info("Close All Positions." + str(res))
     return  RedirectResponse(url="/admin/home")
 
-@app.get('/signal')
-def set_signal(signal:str=None):
-    Bingx.signal = signal
-    if not signal:
-         Bingx.signal = None
+
 
 @app.get('/positions')
 def get_positions(symbol:str):
     from main import api
     res = api.getPositions(symbol=symbol)
     logger.info(f"{res}")
-    res = api.getOrders(symbol=symbol)
-    logger.info(f"{res}")
+
+@app.get('/add_signal')
+async def add_signal(symbol:str, side:str, price: float, time:str, db: Session=Depends(get_db)):
+    signal = Signal()
+    signal.symbol = symbol
+    signal.side = side
+    signal.price = price
+    signal.time = time
+    db.add(signal)
+    db.commit()
+    db.close()
+    logger.info(f"add signal: {symbol}-{side}-{price}-{time}")
 
 @app.get('/')
 async def index():

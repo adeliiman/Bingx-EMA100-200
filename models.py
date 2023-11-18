@@ -52,7 +52,7 @@ class Signal(Base):
 
 
 class SignalAdmin(ModelView, model=Signal):
-    column_list = [Signal.id, Signal.symbol, Signal.side, Signal.time, Signal.price]
+    column_list = [Signal.id, Signal.symbol, Signal.side, Signal.price, Signal.time]
     column_searchable_list = [Signal.symbol, Signal.side, Signal.time, Signal.price]
     #icon = "fa-chart-line"
     icon = "fas fa-chart-line"

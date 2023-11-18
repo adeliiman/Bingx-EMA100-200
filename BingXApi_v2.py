@@ -78,7 +78,7 @@ class BingXApi:
             path = '/openApi/swap/v2/user/balance'
             method = "GET"
             paramsMap = {
-            "recvWindow": 0
+            "recvWindow": 5000
             }
             paramsStr = self.praseParam(paramsMap)
             return self.send_request(method, path, paramsStr, payload)
@@ -148,15 +148,15 @@ class BingXApi:
 
         def getOrders(self, symbol):  # --> 'data': {'orders': None}
             payload = {}
-            path = '/openApi/swap/v2/trade/order'
+            path = 'GET /openApi/swap/v2/trade/openOrders'
             method = "GET"
             paramsMap = {
             "symbol": symbol,
-            "orderId": 0,
-            "recvWindow": 0
-             }
+            "recvWindow": 5000
+            }   
             paramsStr = self.praseParam(paramsMap)
             return self.send_request(method, path, paramsStr, payload)
+
 
 
 
@@ -257,17 +257,21 @@ class BingXApi:
 
 
 
-# api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=True)
+# api = BingXApi(APIKEY=config['api_key'], SECRETKEY=config['api_secret'], demo=False)
 # # print(api.getServerTime())
 # klines = api.getKline(symbol="BTC-USDT", interval="1m", limit=20)
 # klines = klines['data'][::-1]
 # import pandas as pd
 # df = pd.DataFrame(klines)
 # df['time'] = pd.to_datetime(df['time']*1000000)
-# print(df)
-# print(api.getBalance())
+# print(df['time'].iat[-1])
 
-# print(api.getOrders("ADA-USDT"))
+
+
+# print(api.getBalance())
+# print(api.getPositions(symbol="BTC-USDT")['data'][0])
+
+# print(api.getOrders("BTC-USDT"))
 # print(api.getStopOrders("ADA-USDT"))
 # print(api.placeOrder(symbol="BTC-USDT", side="BUY",positionSide="LONG", price='30000', quantity=5, tradeType='MARKET'))
 # print("."*10)
