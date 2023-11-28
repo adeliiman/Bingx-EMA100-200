@@ -45,7 +45,7 @@ async def run(tasks: BackgroundTasks, db: Session=Depends(get_db)):
 @app.get('/stop')
 def stop():
     Bingx.bot = "Stop"
-    logger.inf("Bingx stoped. ................")
+    logger.info("Bingx stoped. ................")
     return  RedirectResponse(url="/admin/home")
 
 @app.get('/closeAll')

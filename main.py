@@ -1,9 +1,11 @@
 import json, schedule, time
 import pandas as pd
+import pandas_ta as ta
 from models import Signal
 import concurrent.futures
 from database import SessionLocal
 from BingXApi_v2 import BingXApi
+import random
 
 
 from setLogger import get_logger
@@ -23,8 +25,8 @@ class BingX:
 	trade_value: int = 10
 	ema_fast: int = 100
 	ema_slow: int = 200
-	TP_percent: int = 2
-	SL_percent: int = 1
+	TP_percent: float = 2
+	SL_percent: float = 1
 	symbols: list = []
 
 
@@ -33,9 +35,10 @@ Bingx = BingX()
 
 def get_signal(symbol, interval):
 	klines = api.getKline(symbol=symbol, interval=interval)
+	if not klines['data']:
+		return None, 0, '0'
 	klines = klines['data'][::-1]
-	if not klines:
-		return None
+	
 	df = pd.DataFrame(klines)
 	print(df.head(5))
 	df['time'] = pd.to_datetime(df['time']*1000000)
@@ -52,6 +55,7 @@ def get_signal(symbol, interval):
 
 def check_signal(items):
 	try:
+		time.sleep(0.1 + random.randint(0, 5)/100)
 		symbol = items[0]
 		interval = items[1]
 		signal, price, time_ = get_signal(symbol, interval)
@@ -107,6 +111,7 @@ def check_signal(items):
 
 	except Exception as e:
 		logger.exception(str(e))
+
 
 
 def schedule_signal():

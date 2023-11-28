@@ -14,8 +14,8 @@ class Setting(Base):
     timeframe = Column(String)
     leverage = Column(Integer)
     trade_value = Column(Integer)
-    TP_percent = Column(Integer)
-    SL_percent = Column(Integer)
+    TP_percent = Column(Float)
+    SL_percent = Column(Float)
     ema_fast = Column(Integer)
     ema_slow = Column(Integer)
 
